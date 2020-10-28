@@ -5,6 +5,6 @@ export function fibonacci(n: number): number | string {
     if (n > 0)
         return Math.round((Math.pow(Phi, n - 1) - Math.pow(phi, n - 1)) / Math.sqrt(5));
     else
-        return "invalid input"
+        return "invalid input";
 }
 
