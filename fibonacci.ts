@@ -12,7 +12,7 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.question("Enter a number n ", function (answer) {
+rl.question("Enter a number n greater than 0 ", function (answer) {
     console.log("The nth value in the fibonacci series is:", nth_fibonacci(answer));
     rl.close();
 });
