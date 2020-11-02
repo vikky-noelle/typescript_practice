@@ -6,8 +6,8 @@ export class Cache {
     myCache = new NodeCache();
 
     constructor() {
-        this.myCache.set(1, 0);
-        this.myCache.set(2, 1);
+        this.myCache.set(0, 0);
+        this.myCache.set(1, 1);
     }
 
     // checks if the key exists in cache
