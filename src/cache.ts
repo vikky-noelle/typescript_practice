@@ -1,5 +1,4 @@
-const NodeCache = require("node-cache");
-
+import NodeCache from "node-cache";
 
 export class Cache {
 
@@ -22,7 +21,11 @@ export class Cache {
 
     // gets the value of the key from cache
     get(key: number): number {
-        return this.myCache.get(key);
+        const value = this.myCache.get(key) as number | undefined;
+        if (!value) {
+            throw new Error("value not found in cache");
+        }   
+        return value;
     }
 
     // sets the key value pair in cache
