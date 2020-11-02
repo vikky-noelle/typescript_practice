@@ -12,7 +12,7 @@ export function math_fibonacci(n: number): number | string {
         const phi = (1 - Math.sqrt(5)) / 2;
         const Phi = (1 + Math.sqrt(5)) / 2;
         if (n >= 0) {
-            var result = Math.round((Math.pow(Phi, n - 1) - Math.pow(phi, n - 1)) / Math.sqrt(5));
+            var result = Math.round((Math.pow(Phi, n) - Math.pow(phi, n)) / Math.sqrt(5));
             cache.set(n, result);
             return result;
         }
@@ -30,7 +30,7 @@ export function dp_fibonacci(n: number): number | string {
     }
     else {
         var result = 0;
-        for (var i = 2; i <= n; i++) {
+        for (var i = cache.list().length; i <= n; i++) {
             result = cache.get(i - 1) + cache.get(i - 2);
             cache.set(i, result);
         }
