@@ -1,12 +1,39 @@
 import NodeCache from "node-cache";
+import { EventEmitter } from "events";
 
 export class Cache {
 
     myCache = new NodeCache();
-
+    event;
+    locked: boolean;
     constructor() {
+        this.locked = false;
+        this.event = new EventEmitter();
         this.myCache.set(0, 0);
         this.myCache.set(1, 1);
+    }
+
+    private acquire() {
+        return new Promise(resolve => {
+            if (!this.locked) {
+                this.locked = true;
+                return resolve();
+            }
+
+            const tryAcquire = () => {
+                if (!this.locked) {
+                    this.locked = true;
+                    this.event.removeListener('release', tryAcquire);
+                    return resolve();
+                }
+            };
+            this.event.on('release', tryAcquire);
+        });
+    }
+
+    private release() {
+        this.locked = false;
+        setImmediate(() => this.event.emit('release'));
     }
 
     // checks if the key exists in cache
@@ -22,29 +49,28 @@ export class Cache {
     // gets the value of the key from cache
     get(key: number): number {
         const value = this.myCache.get(key) as number | undefined;
-        if (!value) {
-            throw new Error("value not found in cache");
-        }   
+        if (!value && value != 0) {
+            throw new Error("value not found in cache - " + value);
+        }
         return value;
     }
 
     // sets the key value pair in cache
-    set(key: number, result: number): void {
-        this.myCache.set(key, result);
-    }
-
-    // deletes the key value pair from cache
-    del(key: number): void {
-        this.myCache.del(key);
+    async set(key: number, result: number): Promise<void> {
+        // if (!this.locked) {
+        await this.acquire();
+        try {
+            await this.myCache.set(key, result);
+        }
+        finally {
+            this.release();
+        }
+        console.log("cache data " + this.list());
+        // }
     }
 
     // lists all the value in the cache
     list() {
         return this.myCache.keys();
-    }
-
-    // deletes everything from the cache
-    flush() {
-        this.myCache.flushAll();
     }
 }
