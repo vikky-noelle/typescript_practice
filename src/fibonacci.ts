@@ -3,7 +3,8 @@ import { Cache } from './cache';
 // object of cache class
 const cache = new Cache();
 
-export function mathFibonacci(n: number): number | string {
+export async function mathFibonacci(n: number): Promise<number | string> {
+    cache.list();
     if (cache.check(n)) {
         return cache.get(n);
     }
@@ -13,7 +14,7 @@ export function mathFibonacci(n: number): number | string {
         const Phi = (1 + Math.sqrt(5)) / 2;
         if (n >= 0) {
             var result = Math.round((Math.pow(Phi, n) - Math.pow(phi, n)) / Math.sqrt(5));
-            cache.set(n, result);
+            await cache.set(n, result);
             return result;
         }
         else
@@ -21,7 +22,7 @@ export function mathFibonacci(n: number): number | string {
     }
 }
 
-export function dpFibonacci(n: number): number | string {
+export async function dpFibonacci(n: number): Promise<number | string> {
     if (n < 0) {
         return "invalid input";
     }
@@ -32,7 +33,7 @@ export function dpFibonacci(n: number): number | string {
         var result = 0;
         for (var i = cache.list().length; i <= n; i++) {
             result = cache.get(i - 1) + cache.get(i - 2);
-            cache.set(i, result);
+            await cache.set(i, result);
         }
         return result;
     }
