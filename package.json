@@ -44,5 +44,10 @@
   "bugs": {
     "url": "https://github.com/AryanshMahato/typescript-cli/issues"
   },
-  "homepage": "https://github.com/AryanshMahato/typescript-cli#readme"
+  "homepage": "https://github.com/AryanshMahato/typescript-cli#readme",
+  "dependencies": {
+    "@types/redis": "^2.8.28",
+    "node-cache": "^5.1.2",
+    "tedis": "^0.1.12"
+  }
 }

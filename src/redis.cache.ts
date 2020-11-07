@@ -1,16 +1,27 @@
-import NodeCache from "node-cache";
+import { Tedis } from "tedis";
 import { EventEmitter } from "events";
 
-export class Cache {
+export class RedisCache {
 
-    myCache = new NodeCache();
     event;
     locked: boolean;
+    client;
+
     constructor() {
         this.locked = false;
+        this.client = new Tedis({
+            port: 6379,
+            host: "127.0.0.1"
+        });
+        this.client.on("connect", function () {
+            console.log("connected");
+        });
+        this.client.on("close", function () {
+            console.log("closed");
+        });
         this.event = new EventEmitter();
-        this.myCache.set(0, 0);
-        this.myCache.set(1, 1);
+        this.client.set("0", "0");
+        this.client.set("1", "1");
     }
 
     private acquire() {
@@ -37,39 +48,36 @@ export class Cache {
     }
 
     // checks if the key exists in cache
-    check(key: number): boolean {
-        if (this.myCache.has(key)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    async check(key: number): Promise<number> {
+        const value = await this.client.exists(String(key));
+        return value;
     }
 
     // gets the value of the key from cache
-    get(key: number): number {
-        const value = this.myCache.get(key) as number | undefined;
-        if (!value && value != 0) {
+    async get(key: number): Promise<number> {
+        const value = await this.client.get(String(key)) as number | undefined | null;
+        if (!value || value == null) {
             throw new Error("value not found in cache - " + value);
         }
-        return value;
+        return Number(value);
     }
 
     // sets the key value pair in cache
     async set(key: number, result: number): Promise<void> {
-        // if (!this.locked) {
+        console.log("set invoked");
         await this.acquire();
         try {
-            await this.myCache.set(key, result);
+            console.log("setting values");
+            await this.client.set(String(key), String(result));
         }
         finally {
             this.release();
         }
-        // }
     }
 
-    // lists all the value in the cache
-    list() {
-        return this.myCache.keys();
+    // list
+    async list() {
+        return await this.client.keys("*");
     }
 }
+
