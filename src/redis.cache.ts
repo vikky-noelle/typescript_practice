@@ -1,14 +1,11 @@
 import { Tedis } from "tedis";
-import { EventEmitter } from "events";
 
 export class RedisCache {
 
-    event;
     locked: boolean;
     client;
 
     constructor() {
-        this.locked = false;
         this.client = new Tedis({
             port: 6379,
             host: "127.0.0.1"
@@ -19,32 +16,8 @@ export class RedisCache {
         this.client.on("close", function () {
             console.log("closed");
         });
-        this.event = new EventEmitter();
         this.client.set("0", "0");
         this.client.set("1", "1");
-    }
-
-    private acquire() {
-        return new Promise(resolve => {
-            if (!this.locked) {
-                this.locked = true;
-                return resolve();
-            }
-
-            const tryAcquire = () => {
-                if (!this.locked) {
-                    this.locked = true;
-                    this.event.removeListener('release', tryAcquire);
-                    return resolve();
-                }
-            };
-            this.event.on('release', tryAcquire);
-        });
-    }
-
-    private release() {
-        this.locked = false;
-        setImmediate(() => this.event.emit('release'));
     }
 
     // checks if the key exists in cache
@@ -65,13 +38,12 @@ export class RedisCache {
     // sets the key value pair in cache
     async set(key: number, result: number): Promise<void> {
         console.log("set invoked");
-        await this.acquire();
         try {
             console.log("setting values");
             await this.client.set(String(key), String(result));
         }
-        finally {
-            this.release();
+        catch (e) {
+            console.log(e);
         }
     }
 
