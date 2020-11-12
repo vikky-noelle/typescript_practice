@@ -1,5 +1,5 @@
 # typescript practice
-## nth fibonacci series
+## [nth fibonacci series](https://github.com/vikky-noelle/typescript_practice/blob/main/src/fibonacci.ts)
 fibonacci series online concept reference https://math.hmc.edu/funfacts/fibonacci-number-formula/
 
 ## [Icart Implementation](https://github.com/vikky-noelle/typescript_practice/blob/main/src/cart.ts)
