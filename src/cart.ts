@@ -1,9 +1,9 @@
 export interface ICart {
-    add(product: Product): void;
-    get(id: string): Product | undefined;
-    getAll(): Product[];
-    update(id: string, product: Product): void;
-    remove(id: string): void;
+    add(name: String): boolean | String;
+    get(id: number): object | undefined;
+    getAll(): object[];
+    update(id: number, name: String): boolean;
+    remove(id: number): boolean;
     removeAll(): void;
     count(): number;
 };
@@ -11,64 +11,70 @@ export interface ICart {
 var idCounter = 1;
 
 export class Cart implements ICart {
-    private productMap: Map<string, Product> = new Map();
+    private productArray: { id: number, name: String }[] = [];
 
-    public add(product: Product): void {
-        this.productMap.set(product.id, product);
+    public add(name: String): boolean | String {
+        try {
+            this.productArray.push({
+                id: idCounter,
+                name: name
+            });
+            idCounter += 1;
+            return true;
+        }
+        catch (e) {
+            return e;
+        }
     }
 
-    public update(id: string, product: Product): void {
-        this.productMap.set(id, product);
+    public update(id: number, name: String): boolean {
+        try {
+            for (var i in this.productArray) {
+                if (this.productArray[i].id == id) {
+                    this.productArray[i].name = name;
+                }
+            }
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
     }
 
-    public get(id: string): Product | undefined {
-        return this.productMap.get(id);
+    public get(id: number): object | undefined {
+        for (var i in this.productArray) {
+            if (this.productArray[i].id == id) {
+                return this.productArray[i];
+            }
+        }
+        return undefined;
     }
 
-    public getAll(): Product[] {
-        return Array.from(this.productMap.values());
+    public getAll(): object[] {
+        return this.productArray;
     }
 
-    public remove(id: string): void {
-        this.productMap.delete(id);
+    public remove(id: number): boolean {
+        try {
+            let tempArray = [];
+            for (var i in this.productArray) {
+                if (this.productArray[i].id != id) {
+                    tempArray.push(this.productArray[i]);
+                }
+            }
+            this.productArray = tempArray;
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
     }
 
     public removeAll(): void {
-        this.productMap.clear();
+        this.productArray = [];
     }
 
     public count(): number {
-        return this.productMap.size;
-    }
-}
-
-export interface IProduct {
-    _name: String,
-    _id: String,
-    _price: number
-};
-
-export class Product implements IProduct {
-    _name;
-    _id;
-    _price;
-
-
-    constructor(name: string, price: number) {
-        this._name = name;
-        this._price = price;
-        this._id = idCounter.toString();
-        idCounter += 1;
-    }
-
-    public get name(): string {
-        return this._name;
-    }
-
-    public get id(): string {
-        return this._id;
-    }
-    public get price(): number {
-        return this._price;
+        return this.productArray.length;
     }
 }
