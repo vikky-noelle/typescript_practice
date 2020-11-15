@@ -1,47 +1,61 @@
 export interface ICart {
-    add(name: String): boolean | String;
-    get(id: number): object | undefined;
-    getAll(): object[];
-    update(id: number, name: String): boolean;
+    add(name: string): boolean | string | undefined;
+    get(id: number): product | undefined;
+    getAll(): product[];
+    update(id: number, name: string): boolean;
     remove(id: number): boolean;
-    removeAll(): void;
+    removeAll(): void | string;
     count(): number;
 };
 
+interface product {
+    id: number,
+    name: string
+}
 var idCounter = 1;
 
 export class Cart implements ICart {
-    private productArray: { id: number, name: String }[] = [];
+    private productArray: product[] = [];
 
-    public add(name: String): boolean | String {
+    public add(name: string): boolean | string | undefined {
         try {
-            this.productArray.push({
-                id: idCounter,
-                name: name
-            });
-            idCounter += 1;
-            return true;
+            if (name.length <= 0)
+                throw undefined;
+            else if (!isNaN(+name))
+                throw "Name only contains number";
+            else {
+                this.productArray.push({
+                    id: idCounter,
+                    name: name
+                });
+                idCounter += 1;
+                return true;
+            }
         }
         catch (e) {
             return e;
         }
+
     }
 
-    public update(id: number, name: String): boolean {
-        try {
-            for (var i in this.productArray) {
-                if (this.productArray[i].id == id) {
-                    this.productArray[i].name = name;
+    public update(id: number, name: string): boolean {
+        if (name.length > 0)
+            try {
+                for (var i in this.productArray) {
+                    if (this.productArray[i].id == id) {
+                        this.productArray[i].name = name;
+                    }
                 }
+                return true;
             }
-            return true;
-        }
-        catch (e) {
+            catch (e) {
+                return false;
+            }
+        else
             return false;
-        }
     }
 
-    public get(id: number): object | undefined {
+    public get(id: number): product | undefined {
         for (var i in this.productArray) {
             if (this.productArray[i].id == id) {
                 return this.productArray[i];
@@ -50,7 +64,7 @@ export class Cart implements ICart {
         return undefined;
     }
 
-    public getAll(): object[] {
+    public getAll(): product[] {
         return this.productArray;
     }
 
@@ -62,6 +76,8 @@ export class Cart implements ICart {
                     tempArray.push(this.productArray[i]);
                 }
             }
+            if (this.productArray.length == tempArray.length)
+                return false;
             this.productArray = tempArray;
             return true;
         }
@@ -70,8 +86,15 @@ export class Cart implements ICart {
         }
     }
 
-    public removeAll(): void {
-        this.productArray = [];
+    public removeAll(): void | string {
+        try {
+            if (this.productArray.length == 0)
+                throw "empty list";
+            this.productArray = [];
+        }
+        catch (e) {
+            return e;
+        }
     }
 
     public count(): number {
