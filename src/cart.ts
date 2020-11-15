@@ -15,7 +15,7 @@ interface product {
 var idCounter = 1;
 
 export class Cart implements ICart {
-    private productArray: product[] = [];
+    private readonly productArray: product[] = [];
 
     public add(name: string): boolean | string | undefined {
         try {
@@ -70,15 +70,18 @@ export class Cart implements ICart {
 
     public remove(id: number): boolean {
         try {
-            let tempArray = [];
+            let count = false;
             for (var i in this.productArray) {
-                if (this.productArray[i].id != id) {
-                    tempArray.push(this.productArray[i]);
+                // console.log(this.productArray[i]);
+                if (this.productArray[i].id == id) {
+                    this.productArray.splice(+i, 1);
+                    count = true;
+                    break;
                 }
             }
-            if (this.productArray.length == tempArray.length)
+            // console.log(count);
+            if (!count)
                 return false;
-            this.productArray = tempArray;
             return true;
         }
         catch (e) {
@@ -90,7 +93,7 @@ export class Cart implements ICart {
         try {
             if (this.productArray.length == 0)
                 throw "empty list";
-            this.productArray = [];
+            this.productArray.splice(0, this.productArray.length);
         }
         catch (e) {
             return e;
