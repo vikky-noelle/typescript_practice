@@ -1,5 +1,5 @@
 export interface ICart {
-    add(name: string): boolean | string | undefined;
+    add(name: string): number | string | undefined;
     get(id: number): product | undefined;
     getAll(): product[];
     update(id: number, name: string): boolean;
@@ -17,7 +17,7 @@ var idCounter = 1;
 export class Cart implements ICart {
     private readonly productArray: product[] = [];
 
-    public add(name: string): boolean | string | undefined {
+    public add(name: string): number | string | undefined {
         try {
             if (name.length <= 0)
                 throw undefined;
@@ -29,7 +29,7 @@ export class Cart implements ICart {
                     name: name
                 });
                 idCounter += 1;
-                return true;
+                return idCounter - 1;
             }
         }
         catch (e) {
